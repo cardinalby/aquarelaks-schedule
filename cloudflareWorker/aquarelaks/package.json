@@ -1,0 +1,12 @@
+{
+  "name": "aquarelaks",
+  "version": "0.0.1",
+  "devDependencies": {
+    "wrangler": "2.8.0"
+  },
+  "private": true,
+  "scripts": {
+    "start": "wrangler dev",
+    "deploy": "wrangler publish"
+  }
+}
