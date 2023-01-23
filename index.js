@@ -9,24 +9,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { joinPdfs } from "./pdfBuilder";
 import { getScheduleLinks } from "./aquarelaksPage";
-function openPdf(pdf) {
-    const blob = new Blob([pdf], { type: "application/pdf" });
-    const url = window.URL.createObjectURL(blob);
-    window.location.assign(url);
-}
+import { getProxiedUrl } from "./urls";
+import { renderPdf } from "./pdfViewer";
 function start() {
     return __awaiter(this, void 0, void 0, function* () {
-        const links = yield getScheduleLinks();
+        const links = yield getScheduleLinks(new Date("01.09.2023"));
         if (links.length === 0) {
             document.body.append("No schedule files found");
             return;
         }
         if (links.length === 1) {
-            window.location.assign(links[0].url);
-            return;
+            return renderPdf(getProxiedUrl(links[0].url), document.body);
         }
         const pdf = yield joinPdfs(links.map(link => link.url));
-        openPdf(pdf);
+        return renderPdf(pdf, document.body);
     });
 }
 start().catch(console.error);
