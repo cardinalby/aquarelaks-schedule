@@ -48,6 +48,12 @@ export function sortScheduleLinks(links) {
                 return a.toDate.getTime() - b.toDate.getTime();
             }
         }
+        if (!a.fromDate && !a.toDate && (b.fromDate || b.toDate)) {
+            return 1;
+        }
+        if (!b.fromDate && !b.toDate && (a.fromDate || a.toDate)) {
+            return -1;
+        }
         return 0;
     });
     return res;
@@ -75,10 +81,7 @@ export function parseScheduleLinkText(text) {
             break;
         }
     }
-    if (!parsed) {
-        throw new Error("Can't parse link text: " + text);
-    }
-    return parsed;
+    return parsed || { fromDate: null, toDate: null };
 }
 export function extractScheduleLinks(dom) {
     var _a;
