@@ -1,8 +1,9 @@
 // noinspection NodeCoreCodingAssistance
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-module.exports = {
+const config = {
     entry: "./src/index.ts",
     output: {
         filename: "bundle.js",
@@ -15,6 +16,18 @@ module.exports = {
         rules: [{ test: /\.ts$/, loader: "ts-loader" }]
     },
     plugins: [
-        new HtmlWebpackPlugin()
+        new HtmlWebpackPlugin({title: 'Aquarelaks', favicon: 'static/favicon.png'}),
+        new CopyWebpackPlugin({
+            patterns: [
+                { from: 'node_modules/pdfjs-dist/build/pdf.worker.js', to: 'pdf.worker.js' },
+                //{ from: 'static/favicon.png', to: 'favicon.png' }
+            ]
+        })
     ]
 }
+
+if (process.argv.includes('--mode=development')) {
+    config.devtool = 'inline-source-map';
+}
+
+module.exports = config
