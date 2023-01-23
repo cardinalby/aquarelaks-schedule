@@ -13,13 +13,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: 16
           cache: 'npm'
-
-      - name: Cd to web dir
-        run: cd web
+          cache-dependency-path: web/package-lock.json
 
       - name: Install dependencies
         run: npm ci
