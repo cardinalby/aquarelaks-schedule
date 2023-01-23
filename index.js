@@ -8,22 +8,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { joinPdfs } from "./pdfBuilder";
-import { getScheduleLinks } from "./aquarelaksPage";
-import { getProxiedUrl } from "./urls";
+import { getPageDom, getScheduleLinks } from "./aquarelaksPage";
+import { AQUARELAKS_URL, getProxiedUrl } from "./urls";
 import { renderPdf } from "./pdfViewer";
-function start() {
+import { ProgressInfo } from "./progressInfo";
+function start(progress) {
     return __awaiter(this, void 0, void 0, function* () {
-        const links = yield getScheduleLinks(new Date("01.09.2023"));
+        progress.addMessage("Requesting page...");
+        const dom = yield getPageDom(getProxiedUrl(AQUARELAKS_URL));
+        progress.addMessage("Parsing links...");
+        const links = yield getScheduleLinks(dom);
         if (links.length === 0) {
-            document.body.append("No schedule files found");
-            return;
+            throw new Error("Error: no schedule files found");
         }
         if (links.length === 1) {
-            return renderPdf(getProxiedUrl(links[0].url), document.body);
+            progress.addMessage(`1 link found, rendering...`);
+            return renderPdf(getProxiedUrl(links[0].url), document.body, () => progress.detach());
         }
+        progress.addMessage(`${links.length} links found, downloading and joining...`);
         const pdf = yield joinPdfs(links.map(link => link.url));
-        return renderPdf(pdf, document.body);
+        progress.addMessage(`Rendering joined pdf...`);
+        return renderPdf(pdf, document.body, () => progress.detach());
     });
 }
-start().catch(console.error);
+const progress = ProgressInfo.attach(document.body);
+start(progress).catch(err => progress.addError(err));
 //# sourceMappingURL=index.js.map

@@ -32,12 +32,13 @@ function renderOnce(doc, container) {
         }
     });
 }
-export function renderPdf(pdfSource, container) {
+export function renderPdf(pdfSource, container, beforeRender = undefined) {
     return __awaiter(this, void 0, void 0, function* () {
         pdfjs.GlobalWorkerOptions.workerSrc = "pdf.worker.js";
         const doc = yield pdfjs.getDocument(typeof pdfSource === 'string'
             ? { url: pdfSource }
             : { data: pdfSource }).promise;
+        beforeRender && beforeRender();
         const containerDiv = document.createElement('div');
         containerDiv.style.width = '100%';
         container.appendChild(containerDiv);

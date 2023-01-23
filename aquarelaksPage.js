@@ -8,12 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import moment from "moment";
-import { AQUARELAKS_URL, getProxiedUrl } from "./urls";
 const SCHEDULE_FOLD_NODE_SUBSTR = "GRAFIK DOSTĘPNOŚCI";
 const DATE_FORMAT = 'DD-MM-YYYY';
-export function getScheduleLinks(after = new Date()) {
+export function getScheduleLinks(dom, after = new Date()) {
     return __awaiter(this, void 0, void 0, function* () {
-        const dom = yield getPageDom(getProxiedUrl(AQUARELAKS_URL));
         return sortScheduleLinks(extractScheduleLinks(dom)
             .map(link => {
             const parsedText = parseScheduleLinkText(link.text);
