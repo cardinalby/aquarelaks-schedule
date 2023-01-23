@@ -39,6 +39,8 @@ export function isRelevantLink(link: ParsedScheduleLinkText, startingFrom: Date)
 }
 
 export function sortScheduleLinks<T extends ParsedScheduleLinkText>(links: T[]): T[] {
+    //  > 0     sort a after b
+    //  < 0     sort a before b
     const res = Array.from(links)
     res.sort((a, b) => {
         if (a.fromDate) {
@@ -56,6 +58,12 @@ export function sortScheduleLinks<T extends ParsedScheduleLinkText>(links: T[]):
             if (b.toDate) {
                 return a.toDate.getTime() - b.toDate.getTime()
             }
+        }
+        if (!a.fromDate && !a.toDate && (b.fromDate || b.toDate)) {
+            return 1
+        }
+        if (!b.fromDate && !b.toDate && (a.fromDate || a.toDate)) {
+            return -1
         }
         return 0
     })
@@ -89,11 +97,8 @@ export function parseScheduleLinkText(text: string): ParsedScheduleLinkText {
             break
         }
     }
-    if (!parsed) {
-        throw new Error("Can't parse link text: " + text)
-    }
 
-    return parsed
+    return parsed || {fromDate: null, toDate: null}
 }
 
 export function extractScheduleLinks(dom: Document): RawScheduleLink[] {
