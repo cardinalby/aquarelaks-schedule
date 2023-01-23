@@ -1,5 +1,4 @@
 import moment from "moment";
-import {AQUARELAKS_URL, getProxiedUrl} from "./urls";
 
 const SCHEDULE_FOLD_NODE_SUBSTR = "GRAFIK DOSTĘPNOŚCI"
 const DATE_FORMAT = 'DD-MM-YYYY'
@@ -18,8 +17,7 @@ export interface ScheduleLink extends ParsedScheduleLinkText {
     url: string
 }
 
-export async function getScheduleLinks(after: Date = new Date()): Promise<ScheduleLink[]>  {
-    const dom = await getPageDom(getProxiedUrl(AQUARELAKS_URL))
+export async function getScheduleLinks(dom: Document, after: Date = new Date()): Promise<ScheduleLink[]>  {
     return sortScheduleLinks(
         extractScheduleLinks(dom)
             .map(link => {

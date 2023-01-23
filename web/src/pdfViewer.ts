@@ -25,7 +25,11 @@ async function renderOnce(doc: PDFDocumentProxy, container: HTMLElement, ) {
     }
 }
 
-export async function renderPdf(pdfSource: Uint8Array|string, container: HTMLElement) {
+export async function renderPdf(
+    pdfSource: Uint8Array|string,
+    container: HTMLElement,
+    beforeRender: (() => void)|undefined = undefined
+) {
     pdfjs.GlobalWorkerOptions.workerSrc = "pdf.worker.js"
     const doc = await pdfjs.getDocument(
         typeof pdfSource === 'string'
@@ -33,6 +37,7 @@ export async function renderPdf(pdfSource: Uint8Array|string, container: HTMLEle
             : {data: pdfSource}
     ).promise
 
+    beforeRender && beforeRender()
     const containerDiv = document.createElement('div')
     containerDiv.style.width = '100%'
     container.appendChild(containerDiv)

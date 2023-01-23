@@ -1,19 +1,28 @@
 import {joinPdfs} from "./pdfBuilder";
-import {getScheduleLinks} from "./aquarelaksPage";
-import {getProxiedUrl} from "./urls";
+import {getPageDom, getScheduleLinks} from "./aquarelaksPage";
+import {AQUARELAKS_URL, getProxiedUrl} from "./urls";
 import {renderPdf} from "./pdfViewer";
+import {ProgressInfo} from "./progressInfo";
 
-async function start() {
-    const links = await getScheduleLinks(new Date("01.09.2023"))
+async function start(progress: ProgressInfo) {
+    progress.addMessage("Requesting page...")
+    const dom = await getPageDom(getProxiedUrl(AQUARELAKS_URL))
+
+    progress.addMessage("Parsing links...")
+    const links = await getScheduleLinks(dom)
     if (links.length === 0) {
-        document.body.append("No schedule files found")
-        return
+        throw new Error("Error: no schedule files found")
     }
     if (links.length === 1) {
-        return renderPdf(getProxiedUrl(links[0].url), document.body)
+        progress.addMessage(`1 link found, rendering...`)
+        return renderPdf(getProxiedUrl(links[0].url), document.body, () => progress.detach())
     }
+    progress.addMessage(`${links.length} links found, downloading and joining...`)
     const pdf = await joinPdfs(links.map(link => link.url))
-    return renderPdf(pdf, document.body)
+
+    progress.addMessage(`Rendering joined pdf...`)
+    return renderPdf(pdf, document.body, () => progress.detach())
 }
 
-start().catch(console.error)
+const progress = ProgressInfo.attach(document.body)
+start(progress).catch(err => progress.addError(err))
