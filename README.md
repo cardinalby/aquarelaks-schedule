@@ -5,4 +5,6 @@ with schedule and joins them if needed.
 
 `cloudflareWorker` dir contains JS Cloudflare Worker to bypass CORS while fetching the page and schedule pdfs.
 
-`web` dir contains a front-end TS application
+`web` dir contains a front-end TS application. You may find it useful as an example of parsing and building 
+pdf files (lib-pdf) and rendering pdf on the page (pdfjs, it's needed because mobile Chrome browser 
+doesn't show pdf but downloads it instead)
