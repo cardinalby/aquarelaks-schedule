@@ -18,7 +18,7 @@ export interface ScheduleLink extends ParsedScheduleLinkText {
 }
 
 export async function getScheduleLinks(dom: Document, after: Date = new Date()): Promise<ScheduleLink[]>  {
-    return sortScheduleLinks(
+    return rearrangeScheduleLinks(
         extractScheduleLinks(dom)
             .map(link => {
                 const parsedText = parseScheduleLinkText(link.text)
@@ -28,8 +28,25 @@ export async function getScheduleLinks(dom: Document, after: Date = new Date()):
                    toDate: parsedText.toDate
                 }
             })
-            .filter(link => isRelevantLink(link, after))
     )
+}
+
+export function rearrangeScheduleLinks<T extends ParsedScheduleLinkText>(
+    links: T[],
+    after: Date = new Date()
+): T[] {
+    let latestFromDate: Date|undefined = undefined
+    return sortScheduleLinks(links
+        .filter(link => isRelevantLink(link, after))
+    ).reduceRight((previousValue: T[], currentValue: T, currentIndex: number, array: T[]) => {
+        if (!currentValue.fromDate || currentValue.toDate) {
+            previousValue.push(currentValue)
+        } else if (!latestFromDate) {
+            latestFromDate = currentValue.fromDate
+            previousValue.push(currentValue)
+        }
+        return previousValue
+    }, [])
 }
 
 export function isRelevantLink(link: ParsedScheduleLinkText, startingFrom: Date): boolean {

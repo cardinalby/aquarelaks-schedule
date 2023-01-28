@@ -2,7 +2,7 @@ import {
     extractScheduleLinks,
     isRelevantLink,
     ParsedScheduleLinkText,
-    parseScheduleLinkText,
+    parseScheduleLinkText, rearrangeScheduleLinks,
     sortScheduleLinks
 } from "../src/aquarelaksPage";
 import {JSDOM} from "jsdom";
@@ -86,6 +86,27 @@ describe('isRelevantLink', () => {
         expect(isRelevantLink(link, new Date("1.10.2023"))).toEqual(true)
         expect(isRelevantLink(link, new Date("1.11.2023"))).toEqual(false)
     });
+})
+
+describe('rearrangeScheduleLinks', () => {
+    let
+        from10to20 = {fromDate: new Date("1.10.2023"), toDate: new Date("1.20.2023")},
+        from5 = {fromDate: new Date("1.5.2023"), toDate: null},
+        from15 = {fromDate: new Date("1.15.2023"), toDate: null},
+        to10 = {fromDate: null, toDate: new Date("1.10.2023")},
+        to25 = {fromDate: null, toDate: new Date("1.25.2023")}
+
+    expect(rearrangeScheduleLinks(
+        [from10to20, to25, to10, from15, from5], new Date("1.15.2023")
+    )).toEqual(
+        [from15, from10to20, to25]
+    )
+
+    expect(rearrangeScheduleLinks(
+        [from15, from5], new Date("1.15.2023")
+    )).toEqual(
+        [from15]
+    )
 })
 
 describe('sortScheduleLinks', () => {
