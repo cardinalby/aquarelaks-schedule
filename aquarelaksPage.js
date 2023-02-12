@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import * as moment from "moment";
 const SCHEDULE_FOLD_NODE_SUBSTR = "GRAFIK DOSTĘPNOŚCI";
 const DATE_FORMAT = 'DD-MM-YYYY';
-export function getScheduleLinks(dom, after = new Date()) {
+export function getScheduleLinks(dom, after) {
     return __awaiter(this, void 0, void 0, function* () {
         return rearrangeScheduleLinks(extractScheduleLinks(dom)
             .map(link => {
@@ -23,19 +23,26 @@ export function getScheduleLinks(dom, after = new Date()) {
         }), after);
     });
 }
-export function rearrangeScheduleLinks(links, after = new Date()) {
+export function rearrangeScheduleLinks(links, after) {
+    var _a;
     let latestFromDate = undefined;
-    return sortScheduleLinks(links
-        .filter(link => isRelevantLink(link, after))).reduceRight((previousValue, currentValue) => {
+    let res = sortScheduleLinks(links
+        .filter(link => isRelevantLink(link, after)))
+        .reduceRight((previousValue, currentValue) => {
         if (!currentValue.fromDate || currentValue.toDate) {
-            previousValue.push(currentValue);
+            previousValue = [currentValue].concat(previousValue);
         }
         else if (!latestFromDate) {
             latestFromDate = currentValue.fromDate;
-            previousValue.push(currentValue);
+            previousValue = [currentValue].concat(previousValue);
         }
         return previousValue;
     }, []);
+    const earliestFromDateGtAfter = (_a = res.find(l => l.fromDate && l.fromDate >= after)) === null || _a === void 0 ? void 0 : _a.fromDate;
+    if (earliestFromDateGtAfter) {
+        return res.filter(l => l.toDate || !l.fromDate || l.fromDate >= earliestFromDateGtAfter);
+    }
+    return res;
 }
 export function isRelevantLink(link, startingFrom) {
     return !(link.toDate !== null && link.toDate < startingFrom);
@@ -48,12 +55,12 @@ export function sortScheduleLinks(links) {
                 return a.fromDate.getTime() - b.fromDate.getTime();
             }
             if (b.toDate) {
-                return 1;
+                return a.fromDate.getTime() - b.toDate.getTime();
             }
         }
         if (a.toDate) {
             if (b.fromDate) {
-                return -1;
+                return a.toDate.getTime() - b.fromDate.getTime();
             }
             if (b.toDate) {
                 return a.toDate.getTime() - b.toDate.getTime();

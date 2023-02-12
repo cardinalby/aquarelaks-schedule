@@ -12,12 +12,13 @@ import { getPageDom, getScheduleLinks } from "./aquarelaksPage";
 import { AQUARELAKS_URL, getProxiedUrl } from "./urls";
 import { renderPdf } from "./pdfViewer";
 import { ProgressInfo } from "./progressInfo";
+import { getTodayDate } from "./utils";
 function start(progress) {
     return __awaiter(this, void 0, void 0, function* () {
         progress.addMessage("Requesting page...");
         const dom = yield getPageDom(getProxiedUrl(AQUARELAKS_URL));
         progress.addMessage("Parsing links...");
-        const links = yield getScheduleLinks(dom);
+        const links = yield getScheduleLinks(dom, getTodayDate());
         if (links.length === 0) {
             throw new Error("Error: no schedule files found");
         }
