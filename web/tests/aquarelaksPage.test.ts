@@ -26,6 +26,15 @@ describe('parseScheduleLinkText', () => {
         expect(r.fromDate).toEqual(new Date("1.16.2023"))
         expect(r.toDate).toEqual(null)
     });
+
+    it('range 2', () => {
+        const r = parseScheduleLinkText(
+            "Grafik dostępności torów oraz niecki basenowej w dniach 11-12.02.2023"
+        )
+        expect(r).not.toBeNull()
+        expect(r.fromDate).toEqual(new Date("02.11.2023"))
+        expect(r.toDate).toEqual(new Date("02.12.2023"))
+    });
 })
 
 describe('extractScheduleLinks', () => {
