@@ -59,7 +59,31 @@ describe('extractScheduleLinks', () => {
         expect(res[0].text.trim()).toEqual('Grafik dostępności torów oraz niecki basenowej w dniach 09.01.2023 – 15.01.2023')
         expect(res[1].url).toEqual('https://ucsir.pl/wp-content/uploads/2023/01/Dostepnosc-torow-i-niecki-od-16.01.2023-zmianaII.pdf')
         expect(res[1].text.trim()).toEqual('Grafik dostępności torów oraz niecki basenowej od 16.01.2023')
+    })
 
+    it('example2.html', async () => {
+        const jsdom = require("jsdom")
+        const { JSDOM } = jsdom
+        global.DOMParser = new JSDOM().window.DOMParser
+
+        const data = await new Promise<Buffer>((resolve, reject) => {
+            fs.readFile('tests/example2.html', (err, data) => {
+                if (err) {
+                    reject(err)
+                }
+                resolve(data)
+            })
+        })
+
+        const dom = (new DOMParser()).parseFromString(data.toString(), "text/html")
+        const res = extractScheduleLinks(dom)
+        expect(res.length).toEqual(3)
+        expect(res[0].url).toEqual('https://ucsir.pl/wp-content/uploads/2023/01/Dostepnosc-torow-i-niecki-od-1.02.2023.pdf')
+        expect(res[0].text.trim()).toEqual('Grafik dostępności torów oraz niecki basenowej od 01.02.2023')
+        expect(res[1].url).toEqual('https://ucsir.pl/wp-content/uploads/grafiki/moczydlo/11-12.02.2023.pdf')
+        expect(res[1].text.trim()).toEqual('Grafik dostępności torów oraz niecki basenowej w dniach 11-12.02.2023')
+        expect(res[2].url).toEqual('https://ucsir.pl/wp-content/uploads/grafiki/moczydlo/13-26.02.2023.pdf')
+        expect(res[2].text.trim()).toEqual('Grafik dostępności torów oraz niecki basenowej w dniach 13-26.02.2023')
     })
 })
 
@@ -108,7 +132,7 @@ describe('rearrangeScheduleLinks', () => {
     expect(rearrangeScheduleLinks(
         [from10to20, to25, to10, from15, from5], new Date("1.15.2023")
     )).toEqual(
-        [from15, from10to20, to25]
+        [from10to20, from15, to25]
     )
 
     expect(rearrangeScheduleLinks(
@@ -133,18 +157,27 @@ describe('sortScheduleLinks', () => {
     expect(sortScheduleLinks(
         [from10to20, to25, from5to15, from5]
     )).toEqual(
-        [to25, from5to15, from5, from10to20]
+        [from5to15, from5, from10to20, to25]
     )
 
     expect(sortScheduleLinks(
-        [from15to25, from15, from10to20, from25, to10, to15, ]
+        [from15to25, from15, from25, to10, to15, ]
     )).toEqual(
-        [to10, to15, from10to20, from15to25, from15, from25]
+        [to10, from15to25, from15, to15, from25]
     )
 
     expect(sortScheduleLinks(
         [from15, from5to15]
     )).toEqual(
         [from5to15, from15]
+    )
+
+    const from11to12 = {fromDate: new Date("02.11.2023"), toDate: new Date("02.12.2023")}
+    const from13to26 = {fromDate: new Date("02.13.2023"), toDate: new Date("02.26.2023")}
+
+    expect(sortScheduleLinks(
+        [from11to12, from13to26]
+    )).toEqual(
+        [from11to12, from13to26]
     )
 })

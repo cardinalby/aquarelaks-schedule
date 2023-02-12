@@ -3,13 +3,14 @@ import {getPageDom, getScheduleLinks} from "./aquarelaksPage";
 import {AQUARELAKS_URL, getProxiedUrl} from "./urls";
 import {renderPdf} from "./pdfViewer";
 import {ProgressInfo} from "./progressInfo";
+import {getTodayDate} from "./utils";
 
 async function start(progress: ProgressInfo) {
     progress.addMessage("Requesting page...")
     const dom = await getPageDom(getProxiedUrl(AQUARELAKS_URL))
 
     progress.addMessage("Parsing links...")
-    const links = await getScheduleLinks(dom)
+    const links = await getScheduleLinks(dom, getTodayDate())
     if (links.length === 0) {
         throw new Error("Error: no schedule files found")
     }

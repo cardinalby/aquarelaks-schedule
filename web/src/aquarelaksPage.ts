@@ -17,7 +17,7 @@ export interface ScheduleLink extends ParsedScheduleLinkText {
     url: string
 }
 
-export async function getScheduleLinks(dom: Document, after: Date = new Date()): Promise<ScheduleLink[]>  {
+export async function getScheduleLinks(dom: Document, after: Date): Promise<ScheduleLink[]>  {
     return rearrangeScheduleLinks(
         extractScheduleLinks(dom)
             .map(link => {
@@ -34,20 +34,26 @@ export async function getScheduleLinks(dom: Document, after: Date = new Date()):
 
 export function rearrangeScheduleLinks<T extends ParsedScheduleLinkText>(
     links: T[],
-    after: Date = new Date()
+    after: Date
 ): T[] {
     let latestFromDate: Date|undefined = undefined
-    return sortScheduleLinks(links
-        .filter(link => isRelevantLink(link, after))
-    ).reduceRight((previousValue: T[], currentValue: T) => {
-        if (!currentValue.fromDate || currentValue.toDate) {
-            previousValue.push(currentValue)
-        } else if (!latestFromDate) {
-            latestFromDate = currentValue.fromDate
-            previousValue.push(currentValue)
-        }
-        return previousValue
-    }, [])
+    let res = sortScheduleLinks(links
+        .filter(link => isRelevantLink(link, after)))
+        .reduceRight((previousValue: T[], currentValue: T) => {
+            if (!currentValue.fromDate || currentValue.toDate) {
+                previousValue = [currentValue].concat(previousValue)
+            } else if (!latestFromDate) {
+                latestFromDate = currentValue.fromDate
+                previousValue = [currentValue].concat(previousValue)
+            }
+            return previousValue
+        }, [])
+
+    const earliestFromDateGtAfter = res.find(l => l.fromDate && l.fromDate >= after)?.fromDate
+    if (earliestFromDateGtAfter) {
+        return res.filter(l => l.toDate || !l.fromDate || l.fromDate >= earliestFromDateGtAfter)
+    }
+    return res
 }
 
 export function isRelevantLink(link: ParsedScheduleLinkText, startingFrom: Date): boolean {
@@ -64,12 +70,12 @@ export function sortScheduleLinks<T extends ParsedScheduleLinkText>(links: T[]):
                 return a.fromDate.getTime() - b.fromDate.getTime()
             }
             if (b.toDate) {
-                return 1
+                return a.fromDate.getTime() - b.toDate.getTime()
             }
         }
         if (a.toDate) {
             if (b.fromDate) {
-                return -1
+                return a.toDate.getTime() - b.fromDate.getTime()
             }
             if (b.toDate) {
                 return a.toDate.getTime() - b.toDate.getTime()

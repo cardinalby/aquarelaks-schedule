@@ -22,6 +22,7 @@
   "private": true,
   "scripts": {
     "clean": "rm -fr dist",
+    "test": "jest",
     "build": "npm run clean && tsc && webpack",
     "build-dev": "tsc && webpack --mode=development"
   }
