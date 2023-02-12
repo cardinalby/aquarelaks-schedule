@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import moment from "moment";
+import * as moment from "moment";
 const SCHEDULE_FOLD_NODE_SUBSTR = "GRAFIK DOSTĘPNOŚCI";
 const DATE_FORMAT = 'DD-MM-YYYY';
 export function getScheduleLinks(dom, after = new Date()) {
@@ -20,13 +20,13 @@ export function getScheduleLinks(dom, after = new Date()) {
                 fromDate: parsedText.fromDate,
                 toDate: parsedText.toDate
             };
-        }));
+        }), after);
     });
 }
 export function rearrangeScheduleLinks(links, after = new Date()) {
     let latestFromDate = undefined;
     return sortScheduleLinks(links
-        .filter(link => isRelevantLink(link, after))).reduceRight((previousValue, currentValue, currentIndex, array) => {
+        .filter(link => isRelevantLink(link, after))).reduceRight((previousValue, currentValue) => {
         if (!currentValue.fromDate || currentValue.toDate) {
             previousValue.push(currentValue);
         }
@@ -73,10 +73,15 @@ export function parseScheduleLinkText(text) {
     const shortText = text.replace("Grafik dostępności torów oraz niecki basenowej", "").trim();
     let dateRegexp = '\\d{1,2}\\.\\d{1,2}\\.\\d{4}';
     const dateRangeRegexp = new RegExp(`(${dateRegexp})\\s*[\\-–]\\s*(${dateRegexp})`);
+    const daysRangeRegexp = new RegExp(`(\\d{1,2})\\s*[\\-–]\\s*(\\d{1,2})\\.(\\d{1,2}\\.\\d{4})`);
     const dateFromRegexp = new RegExp(`(od|po|z).*?(${dateRegexp})`);
     const dateToRegexp = new RegExp(`(do|przed).*?(${dateRegexp})`);
     let cases = [
         [dateRangeRegexp, regexpRes => ({ from: regexpRes[1], to: regexpRes[2] })],
+        [daysRangeRegexp, regexpRes => ({
+                from: regexpRes[1] + '.' + regexpRes[3],
+                to: regexpRes[2] + '.' + regexpRes[3]
+            })],
         [dateFromRegexp, regexpRes => ({ from: regexpRes[2], to: null })],
         [dateToRegexp, regexpRes => ({ from: null, to: regexpRes[2] })]
     ];
