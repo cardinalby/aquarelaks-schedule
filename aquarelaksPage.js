@@ -24,23 +24,36 @@ export function getScheduleLinks(dom, after) {
     });
 }
 export function rearrangeScheduleLinks(links, after) {
-    var _a;
-    let latestFromDate = undefined;
-    let res = sortScheduleLinks(links
-        .filter(link => isRelevantLink(link, after)))
-        .reduceRight((previousValue, currentValue) => {
-        if (!currentValue.fromDate || currentValue.toDate) {
-            previousValue = [currentValue].concat(previousValue);
+    let res = sortScheduleLinks(links);
+    return deduceLinkRanges(res).filter(link => isRelevantLink(link, after));
+}
+export function deduceLinkRanges(links) {
+    const res = links.map(l => Object.assign({}, l));
+    for (let link of res) {
+        if (link.fromDate && !link.toDate) {
+            let nearestFromDate = undefined;
+            for (let l of links) {
+                if (l != link && l.fromDate && l.fromDate > link.fromDate &&
+                    (!nearestFromDate || (l.fromDate < nearestFromDate))) {
+                    nearestFromDate = l.fromDate;
+                }
+                if (nearestFromDate) {
+                    link.toDate = moment(nearestFromDate).subtract(1, 'd').toDate();
+                }
+            }
         }
-        else if (!latestFromDate) {
-            latestFromDate = currentValue.fromDate;
-            previousValue = [currentValue].concat(previousValue);
+        else if (link.toDate && !link.fromDate) {
+            let nearestToDate = undefined;
+            for (let l of links) {
+                if (l != link && l.toDate && l.toDate < link.toDate &&
+                    (!nearestToDate || (l.toDate > nearestToDate))) {
+                    nearestToDate = l.toDate;
+                }
+                if (nearestToDate) {
+                    link.fromDate = moment(nearestToDate).add(1, 'd').toDate();
+                }
+            }
         }
-        return previousValue;
-    }, []);
-    const earliestFromDateGtAfter = (_a = res.find(l => l.fromDate && l.fromDate >= after)) === null || _a === void 0 ? void 0 : _a.fromDate;
-    if (earliestFromDateGtAfter) {
-        return res.filter(l => l.toDate || !l.fromDate || l.fromDate >= earliestFromDateGtAfter);
     }
     return res;
 }

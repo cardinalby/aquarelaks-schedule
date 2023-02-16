@@ -11,6 +11,7 @@ export interface ScheduleLink extends ParsedScheduleLinkText {
 }
 export declare function getScheduleLinks(dom: Document, after: Date): Promise<ScheduleLink[]>;
 export declare function rearrangeScheduleLinks<T extends ParsedScheduleLinkText>(links: T[], after: Date): T[];
+export declare function deduceLinkRanges<T extends ParsedScheduleLinkText>(links: T[]): T[];
 export declare function isRelevantLink(link: ParsedScheduleLinkText, startingFrom: Date): boolean;
 export declare function sortScheduleLinks<T extends ParsedScheduleLinkText>(links: T[]): T[];
 export declare function parseScheduleLinkText(text: string): ParsedScheduleLinkText;
