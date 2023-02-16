@@ -36,22 +36,39 @@ export function rearrangeScheduleLinks<T extends ParsedScheduleLinkText>(
     links: T[],
     after: Date
 ): T[] {
-    let latestFromDate: Date|undefined = undefined
-    let res = sortScheduleLinks(links
-        .filter(link => isRelevantLink(link, after)))
-        .reduceRight((previousValue: T[], currentValue: T) => {
-            if (!currentValue.fromDate || currentValue.toDate) {
-                previousValue = [currentValue].concat(previousValue)
-            } else if (!latestFromDate) {
-                latestFromDate = currentValue.fromDate
-                previousValue = [currentValue].concat(previousValue)
-            }
-            return previousValue
-        }, [])
+    let res = sortScheduleLinks(links)
+    return deduceLinkRanges(res).filter(link => isRelevantLink(link, after))
+}
 
-    const earliestFromDateGtAfter = res.find(l => l.fromDate && l.fromDate >= after)?.fromDate
-    if (earliestFromDateGtAfter) {
-        return res.filter(l => l.toDate || !l.fromDate || l.fromDate >= earliestFromDateGtAfter)
+export function deduceLinkRanges<T extends ParsedScheduleLinkText>(links: T[]): T[] {
+    const res = links.map(l => Object.assign({}, l))
+
+    for (let link of res) {
+        if (link.fromDate && !link.toDate) {
+            let nearestFromDate: Date|undefined = undefined
+            for (let l of links) {
+                if (l != link && l.fromDate && l.fromDate > link.fromDate &&
+                    (!nearestFromDate || (l.fromDate < nearestFromDate))
+                ) {
+                    nearestFromDate = l.fromDate
+                }
+                if (nearestFromDate) {
+                    link.toDate = moment(nearestFromDate).subtract(1, 'd').toDate()
+                }
+            }
+        } else if (link.toDate && !link.fromDate) {
+            let nearestToDate: Date|undefined = undefined
+            for (let l of links) {
+                if (l != link && l.toDate && l.toDate < link.toDate &&
+                    (!nearestToDate || (l.toDate > nearestToDate))
+                ) {
+                    nearestToDate = l.toDate
+                }
+                if (nearestToDate) {
+                    link.fromDate = moment(nearestToDate).add(1, 'd').toDate()
+                }
+            }
+        }
     }
     return res
 }

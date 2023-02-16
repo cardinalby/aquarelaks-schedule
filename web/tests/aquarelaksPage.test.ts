@@ -1,4 +1,5 @@
 import {
+    deduceLinkRanges,
     extractScheduleLinks,
     isRelevantLink,
     ParsedScheduleLinkText,
@@ -122,23 +123,55 @@ describe('isRelevantLink', () => {
 })
 
 describe('rearrangeScheduleLinks', () => {
-    let
-        from10to20 = {fromDate: new Date("1.10.2023"), toDate: new Date("1.20.2023")},
-        from5 = {fromDate: new Date("1.5.2023"), toDate: null},
-        from15 = {fromDate: new Date("1.15.2023"), toDate: null},
-        to10 = {fromDate: null, toDate: new Date("1.10.2023")},
-        to25 = {fromDate: null, toDate: new Date("1.25.2023")}
+    expect(rearrangeScheduleLinks([
+            {fromDate: new Date("1.10.2023"), toDate: new Date("1.20.2023")},
+            {fromDate: null, toDate: new Date("1.25.2023")},
+            {fromDate: null, toDate: new Date("1.10.2023")},
+            {fromDate: new Date("1.15.2023"), toDate: null},
+            {fromDate: new Date("1.5.2023"), toDate: null}
+        ],
+        new Date("1.15.2023")
+    )).toEqual([
+        {fromDate: new Date("1.10.2023"), toDate: new Date("1.20.2023")},
+        {fromDate: new Date("1.15.2023"), toDate: null},
+        {fromDate: new Date("1.21.2023"), toDate: new Date("1.25.2023")}
+    ])
+
+    expect(rearrangeScheduleLinks([
+            {fromDate: new Date("1.15.2023"), toDate: null},
+            {fromDate: new Date("1.5.2023"), toDate: null}
+        ],
+        new Date("1.15.2023")
+    )).toEqual([
+        {fromDate: new Date("1.15.2023"), toDate: null}
+    ])
 
     expect(rearrangeScheduleLinks(
-        [from10to20, to25, to10, from15, from5], new Date("1.15.2023")
+        [
+            {fromDate: new Date("02.01.2023"), toDate: null},
+            {fromDate: new Date("02.13.2023"), toDate: new Date("02.26.2023")}
+        ],
+        new Date("02.15.2023")
     )).toEqual(
-        [from10to20, from15, to25]
+        [
+            {fromDate: new Date("02.13.2023"), toDate: new Date("02.26.2023")}
+        ]
     )
+})
 
-    expect(rearrangeScheduleLinks(
-        [from15, from5], new Date("1.15.2023")
+describe('deduceLinkRanges', () => {
+    expect(deduceLinkRanges(
+        [
+            {fromDate: new Date("02.01.2023"), toDate: null},
+            {fromDate: new Date("02.13.2023"), toDate: new Date("02.26.2023")},
+            {fromDate: null, toDate: new Date("02.30.2023")}
+        ],
     )).toEqual(
-        [from15]
+        [
+            {fromDate: new Date("02.01.2023"), toDate: new Date("02.12.2023")},
+            {fromDate: new Date("02.13.2023"), toDate: new Date("02.26.2023")},
+            {fromDate: new Date("02.27.2023"), toDate: new Date("02.30.2023")}
+        ]
     )
 })
 
