@@ -11,19 +11,23 @@ async function start(progress: ProgressInfo) {
 
     progress.addMessage("Parsing links...")
     const links = await getScheduleLinks(dom, getTodayDate())
-    if (links.length === 0) {
-        throw new Error("Error: no schedule files found")
+    if (links.relevant.length === 0) {
+        throw new Error(`Error: no relevant schedule files found (total: ${links.totalCount})`)
     }
-    if (links.length === 1) {
-        progress.addMessage(`1 link found, rendering...`)
-        return renderPdf(getProxiedUrl(links[0].url), document.body, () => progress.detach())
+    if (links.relevant.length === 1) {
+        progress.addMessage(`1 relevant link found out of ${links.totalCount}, rendering...`)
+        return renderPdf(getProxiedUrl(links.relevant[0].url), document.body, () => progress.detach())
     }
-    progress.addMessage(`${links.length} links found, downloading and joining...`)
-    const pdf = await joinPdfs(links.map(link => link.url))
+    progress.addMessage(
+        `${links.relevant.length} relevant links found out of ${links.totalCount}, downloading and joining...`)
+    const pdf = await joinPdfs(links.relevant.map(link => link.url))
 
     progress.addMessage(`Rendering joined pdf...`)
     return renderPdf(pdf, document.body, () => progress.detach())
 }
 
 const progress = ProgressInfo.attach(document.body)
-start(progress).catch(err => progress.addError(err))
+start(progress).catch(err => {
+    progress.addError(err)
+    progress.addLink("original page", AQUARELAKS_URL)
+})

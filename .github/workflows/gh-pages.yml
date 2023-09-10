@@ -7,7 +7,22 @@ on:
 permissions:
   contents: write
 jobs:
-  deploy:
+  deploy_worker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            cloudflareWorker:
+              - 'cloudflareWorker/**'
+      - name: Deploy
+        if: steps.changes.outputs.cloudflareWorker == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+  deploy_pages:
     runs-on: ubuntu-20.04
     defaults:
       run:
@@ -15,22 +30,34 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            web:
+              - '**'
+
       - uses: actions/setup-node@v3
+        if: steps.changes.outputs.web == 'true'
         with:
           node-version: 16
           cache: 'npm'
           cache-dependency-path: web/package-lock.json
 
       - name: Install dependencies
+        if: steps.changes.outputs.web == 'true'
         run: npm ci
 
       - name: Test
+        if: steps.changes.outputs.web == 'true'
         run: npm run test
 
       - name: Build
+        if: steps.changes.outputs.web == 'true'
         run: npm run build
 
       - name: Deploy 🚀
+        if: steps.changes.outputs.web == 'true'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: ./web/dist

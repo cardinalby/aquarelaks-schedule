@@ -21,6 +21,15 @@ export class ProgressInfo {
         this.container.appendChild(el)
     }
 
+    public addLink(text: string, url: string) {
+        const anchorElement = document.createElement('a')
+        anchorElement.innerText = text
+        anchorElement.setAttribute('href', url)
+        const p = document.createElement('p')
+        p.appendChild(anchorElement)
+        this.container.appendChild(p)
+    }
+
     public detach() {
         this.container.remove()
     }

@@ -6,7 +6,6 @@ import {
     parseScheduleLinkText, rearrangeScheduleLinks,
     sortScheduleLinks
 } from "../src/aquarelaksPage";
-import {JSDOM} from "jsdom";
 import * as fs from "fs";
 
 describe('parseScheduleLinkText', () => {

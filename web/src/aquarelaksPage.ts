@@ -17,19 +17,29 @@ export interface ScheduleLink extends ParsedScheduleLinkText {
     url: string
 }
 
-export async function getScheduleLinks(dom: Document, after: Date): Promise<ScheduleLink[]>  {
-    return rearrangeScheduleLinks(
-        extractScheduleLinks(dom)
-            .map(link => {
-                const parsedText = parseScheduleLinkText(link.text)
-                return {
-                   url: link.url,
-                   fromDate: parsedText.fromDate,
-                   toDate: parsedText.toDate
-                }
-            }),
-        after
-    )
+export interface ScheduleLinksInfo {
+    relevant: ScheduleLink[],
+    totalCount: number
+}
+
+export async function getScheduleLinks(dom: Document, after: Date): Promise<ScheduleLinksInfo>  {
+    const extractedLinks = extractScheduleLinks(dom)
+
+    return {
+        relevant: rearrangeScheduleLinks(
+            extractedLinks
+                .map(link => {
+                    const parsedText = parseScheduleLinkText(link.text)
+                    return {
+                        url: link.url,
+                        fromDate: parsedText.fromDate,
+                        toDate: parsedText.toDate
+                    }
+                }),
+            after
+        ),
+        totalCount: extractedLinks.length
+    }
 }
 
 export function rearrangeScheduleLinks<T extends ParsedScheduleLinkText>(
