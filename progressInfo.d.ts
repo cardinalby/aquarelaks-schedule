@@ -4,5 +4,6 @@ export declare class ProgressInfo {
     private constructor();
     addMessage(msg: string): void;
     addError(msg: string): void;
+    addLink(text: string, url: string): void;
     detach(): void;
 }

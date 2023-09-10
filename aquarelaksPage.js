@@ -12,15 +12,19 @@ const SCHEDULE_FOLD_NODE_SUBSTR = "GRAFIK DOSTĘPNOŚCI";
 const DATE_FORMAT = 'DD-MM-YYYY';
 export function getScheduleLinks(dom, after) {
     return __awaiter(this, void 0, void 0, function* () {
-        return rearrangeScheduleLinks(extractScheduleLinks(dom)
-            .map(link => {
-            const parsedText = parseScheduleLinkText(link.text);
-            return {
-                url: link.url,
-                fromDate: parsedText.fromDate,
-                toDate: parsedText.toDate
-            };
-        }), after);
+        const extractedLinks = extractScheduleLinks(dom);
+        return {
+            relevant: rearrangeScheduleLinks(extractedLinks
+                .map(link => {
+                const parsedText = parseScheduleLinkText(link.text);
+                return {
+                    url: link.url,
+                    fromDate: parsedText.fromDate,
+                    toDate: parsedText.toDate
+                };
+            }), after),
+            totalCount: extractedLinks.length
+        };
     });
 }
 export function rearrangeScheduleLinks(links, after) {

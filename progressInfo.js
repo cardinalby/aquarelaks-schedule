@@ -18,6 +18,14 @@ export class ProgressInfo {
         el.innerText = msg;
         this.container.appendChild(el);
     }
+    addLink(text, url) {
+        const anchorElement = document.createElement('a');
+        anchorElement.innerText = text;
+        anchorElement.setAttribute('href', url);
+        const p = document.createElement('p');
+        p.appendChild(anchorElement);
+        this.container.appendChild(p);
+    }
     detach() {
         this.container.remove();
     }
