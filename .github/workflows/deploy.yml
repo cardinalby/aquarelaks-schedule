@@ -26,6 +26,7 @@ jobs:
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
+          command: publish
 
   deploy_pages:
     runs-on: ubuntu-20.04
@@ -33,7 +34,7 @@ jobs:
       run:
         working-directory: ./web
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: dorny/paths-filter@v2
         id: changes
