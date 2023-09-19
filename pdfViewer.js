@@ -28,7 +28,7 @@ function renderOnce(doc, container) {
                 ? [outputScale, 0, 0, outputScale, 0, 0]
                 : undefined;
             container.appendChild(canvas);
-            yield page.render({ canvasContext: context, viewport, transform: transform });
+            page.render({ canvasContext: context, viewport, transform: transform });
         }
     });
 }
