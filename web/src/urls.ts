@@ -1,4 +1,5 @@
-export const CORS_PROXY_URL = "https://aquarelaks.cardinalby.workers.dev/"
+declare const CORS_PROXY_URL: string
+
 export const AQUARELAKS_URL = "https://sport.um.warszawa.pl/waw/ucsir/pod-strzecha-3"
 
 export const AQUARELAKS_LINKS_BASE_URL = "https://sport.um.warszawa.pl"

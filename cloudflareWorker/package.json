@@ -2,7 +2,7 @@
   "name": "aquarelaks",
   "version": "0.0.1",
   "devDependencies": {
-    "wrangler": "2.8.0"
+    "wrangler": "3.8.0"
   },
   "private": true,
   "scripts": {
