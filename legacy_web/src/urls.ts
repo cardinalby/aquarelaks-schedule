@@ -1,7 +1,5 @@
 export const CORS_PROXY_URL = "https://aquarelaks.cardinalby.workers.dev/"
-export const AQUARELAKS_URL = "https://sport.um.warszawa.pl/waw/ucsir/pod-strzecha-3"
-
-export const AQUARELAKS_LINKS_BASE_URL = "https://sport.um.warszawa.pl"
+export const AQUARELAKS_URL = "https://ucsir.pl/plywalnie/aquarelaks/"
 
 export function getProxiedUrl(destUrl: string) {
     return CORS_PROXY_URL + encodeURIComponent(destUrl)

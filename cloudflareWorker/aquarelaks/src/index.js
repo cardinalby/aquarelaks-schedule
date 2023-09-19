@@ -2,7 +2,7 @@ const ALLOWED_ORIGINS = [
 	'.*'
 ];
 const ALLOWED_DESTINATIONS = [
-	"https://ucsir.pl/.*?"
+	"https://sport.um.warszawa.pl/.*?"
 ];
 
 function isListed(uri, listing) {

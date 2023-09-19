@@ -1,7 +1,5 @@
-Small handy pet project for simplify looking for the swimming pool schedule from 
-[https://ucsir.pl/plywalnie/aquarelaks/](https://ucsir.pl/plywalnie/aquarelaks/).
-The project results in a web page that parses HTML page of the swimming pool, extracting links to PDFs
-with schedule and joins them if needed.
+Small handy pet project to simplify looking for the swimming pool schedule from 
+[https://sport.um.warszawa.pl/waw/ucsir/pod-strzecha-3](https://sport.um.warszawa.pl/waw/ucsir/pod-strzecha-3).
 
 `cloudflareWorker` dir contains JS Cloudflare Worker to bypass CORS while fetching the page and schedule pdfs.
 

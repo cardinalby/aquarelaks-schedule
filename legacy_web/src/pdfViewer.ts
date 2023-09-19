@@ -1,7 +1,7 @@
 import * as pdfjs from "pdfjs-dist"
 import {PDFDocumentProxy} from "pdfjs-dist";
 
-async function renderOnce(doc: PDFDocumentProxy, container: HTMLElement) {
+async function renderOnce(doc: PDFDocumentProxy, container: HTMLElement, ) {
     const outputScale = window.devicePixelRatio || 1;
 
     for (let i = 1; i <= doc.numPages; i++) {
@@ -21,7 +21,7 @@ async function renderOnce(doc: PDFDocumentProxy, container: HTMLElement) {
             ? [outputScale, 0, 0, outputScale, 0, 0]
             : undefined;
         container.appendChild(canvas)
-        page.render({canvasContext: context, viewport, transform: transform})
+        await page.render({canvasContext: context, viewport, transform: transform})
     }
 }
 
