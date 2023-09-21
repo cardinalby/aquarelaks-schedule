@@ -21,7 +21,7 @@
   "scripts": {
     "clean": "rm -fr dist",
     "test": "jest",
-    "build": "npm run clean && tsc && webpack",
+    "build": "npm run clean && tsc && webpack --mode=production",
     "build-dev": "tsc && webpack --mode=development"
   }
 }
