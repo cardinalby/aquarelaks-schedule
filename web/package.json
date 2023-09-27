@@ -2,7 +2,9 @@
   "name": "aquarelaks-schedule",
   "version": "1.1.0",
   "dependencies": {
-    "pdfjs-dist": "^3.2.146"
+    "pdfjs-dist": "^3.2.146",
+    "pdf-lib": "^1.17.1",
+    "moment": "^2.29.1"
   },
   "devDependencies": {
     "@types/jest": "^28.1.8",
