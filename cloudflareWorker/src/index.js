@@ -16,7 +16,12 @@ function isListed(uri, listing) {
 
 export default {
 	async fetch(request) {
-		let requestUrl = decodeURIComponent((new URL(request.url)).pathname.substring(1))
+		let requestUrl = undefined
+		try {
+			requestUrl = decodeURIComponent((new URL(request.url)).pathname.substring(1))
+		} catch (e) {
+			return new Response("Invalid URL", {status: 400})
+		}
 		const originHeader = request.headers.get("Origin")
 		if (!isListed(requestUrl, ALLOWED_DESTINATIONS) ||
 			(originHeader && !isListed(originHeader, ALLOWED_ORIGINS))

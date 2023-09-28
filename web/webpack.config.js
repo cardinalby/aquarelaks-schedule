@@ -6,7 +6,7 @@ const DefinePlugin = require('webpack').DefinePlugin;
 
 const isDevBuild = process.argv.includes('--mode=development')
 
-const config = {
+const config = env => { return {
     entry: "./src/index.ts",
     output: {
         filename: "bundle.js",
@@ -20,9 +20,7 @@ const config = {
     },
     plugins: [
         new DefinePlugin({
-            'CORS_PROXY_URL': JSON.stringify(isDevBuild
-                ? 'http://127.0.0.1:8787/'
-                : 'https://aquarelaks.cardinalby.workers.dev/')
+            'CORS_PROXY_URL': JSON.stringify(env.CORS_PROXY_URL)
         }),
         new HtmlWebpackPlugin({title: 'Aquarelaks', favicon: 'static/favicon.png'}),
         new CopyWebpackPlugin({
@@ -32,6 +30,6 @@ const config = {
         })
     ],
     devtool: isDevBuild ? 'inline-source-map' : undefined
-}
+}}
 
 module.exports = config

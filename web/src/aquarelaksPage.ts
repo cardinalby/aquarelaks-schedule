@@ -1,4 +1,5 @@
 import * as moment from "moment";
+import {AQUARELAKS_LINKS_BASE_URL} from "./urls";
 
 const SCHEDULE_FOLD_NODE_SUBSTR = "GRAFIK DOSTĘPNOŚCI"
 const DATE_FORMAT = 'DD-MM-YYYY'
@@ -171,8 +172,12 @@ export function extractScheduleLinks(dom: Document): RawScheduleLink[] {
             throw new Error(`Link not found in accordion card`)
         }
         const text = buttonElement.textContent
-        const url = linkElement.getAttribute('href')
+        let url = linkElement.getAttribute('href')
+
         if (text && url) {
+            if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                url = AQUARELAKS_LINKS_BASE_URL + url
+            }
             res.push({
                 text: text.trim(),
                 url: url,
