@@ -4,6 +4,11 @@ import {AQUARELAKS_LINKS_BASE_URL} from "./urls";
 const SCHEDULE_FOLD_NODE_SUBSTR = "GRAFIK DOSTĘPNOŚCI"
 const DATE_FORMAT = 'DD-MM-YYYY'
 
+export interface RawScheduleData {
+    links: RawScheduleLink[],
+    notParsedSections: string[]
+}
+
 export interface RawScheduleLink {
     url: string,
     text: string
@@ -20,15 +25,16 @@ export interface ScheduleLink extends ParsedScheduleLinkText {
 
 export interface ScheduleLinksInfo {
     relevant: ScheduleLink[],
+    notParsedSections: string[],
     totalCount: number
 }
 
 export async function getScheduleLinks(dom: Document, after: Date): Promise<ScheduleLinksInfo>  {
-    const extractedLinks = extractScheduleLinks(dom)
+    const extractedData = extractScheduleData(dom)
 
     return {
         relevant: rearrangeScheduleLinks(
-            extractedLinks
+            extractedData.links
                 .map(link => {
                     const parsedText = parseScheduleLinkText(link.text)
                     return {
@@ -39,7 +45,8 @@ export async function getScheduleLinks(dom: Document, after: Date): Promise<Sche
                 }),
             after
         ),
-        totalCount: extractedLinks.length
+        totalCount: extractedData.links.length,
+        notParsedSections: extractedData.notParsedSections,
     }
 }
 
@@ -154,34 +161,43 @@ export function parseScheduleLinkText(text: string): ParsedScheduleLinkText {
     return parsed || {fromDate: null, toDate: null}
 }
 
-export function extractScheduleLinks(dom: Document): RawScheduleLink[] {
+export function extractScheduleData(dom: Document): RawScheduleData {
     const accordionCards = dom.querySelectorAll("div.card")
 
     if (accordionCards.length === null) {
         throw new Error(`Accordion cards not found`)
     }
 
-    const res = Array<RawScheduleLink>()
+    const res = {
+        links: Array<RawScheduleLink>(),
+        notParsedSections: Array<string>()
+    }
+
     for (let accordionCard of accordionCards) {
         const buttonElement = accordionCard.querySelector("button.btn")
         if (buttonElement === null) {
-            throw new Error(`Button not found in accordion card`)
+            res.notParsedSections.push("<unknown>")
+            continue
         }
         const linkElement = accordionCard.querySelector("a")
         if (linkElement === null) {
-            throw new Error(`Link not found in accordion card`)
+            res.notParsedSections.push(buttonElement.textContent || "<unknown>")
+            continue
         }
         const text = buttonElement.textContent
         let url = linkElement.getAttribute('href')
 
         if (text && url) {
+            // noinspection HttpUrlsUsage
             if (!url.startsWith("http://") && !url.startsWith("https://")) {
                 url = AQUARELAKS_LINKS_BASE_URL + url
             }
-            res.push({
+            res.links.push({
                 text: text.trim(),
                 url: url,
             })
+        } else {
+            res.notParsedSections.push("<unknown>")
         }
     }
     return res

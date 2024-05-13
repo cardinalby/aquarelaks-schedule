@@ -44,7 +44,7 @@ export async function renderPdf(
 
     new ResizeObserver(async () => {
         containerDiv.innerHTML = ''
-        renderOnce(doc, containerDiv)
+        await renderOnce(doc, containerDiv)
     }).observe(containerDiv)
 
     await renderOnce(doc, containerDiv)

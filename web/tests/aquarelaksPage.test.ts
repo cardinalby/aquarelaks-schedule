@@ -1,6 +1,6 @@
 import {
     deduceLinkRanges,
-    extractScheduleLinks,
+    extractScheduleData,
     isRelevantLink, ParsedScheduleLinkText,
     parseScheduleLinkText,
     rearrangeScheduleLinks,
@@ -17,6 +17,15 @@ describe('parseScheduleLinkText', () => {
         expect(r).not.toBeNull()
         expect(r.fromDate).toEqual(new Date("9.25.2023"))
         expect(r.toDate).toEqual(new Date("10.01.2023"))
+    });
+
+    it('range shortened', () => {
+        const r = parseScheduleLinkText(
+            "Grafik dostępności w dniach 13-19.05.2024"
+        )
+        expect(r).not.toBeNull()
+        expect(r.fromDate).toEqual(new Date("05.13.2024"))
+        expect(r.toDate).toEqual(new Date("05.19.2024"))
     });
 
     it('from', () => {
@@ -45,10 +54,10 @@ describe('getScheduleLinks', () => {
         })
 
         const dom = (new DOMParser()).parseFromString(data.toString(), "text/html")
-        const res = extractScheduleLinks(dom)
-        expect(res.length).toEqual(1)
-        expect(res[0].url).toEqual('https://sport.um.warszawa.pl/documents/63410428/86678446/25.09.2023-01.10.2023.pdf/efa98ae3-bca3-9d5e-caf6-4a474f73fcf4?t=1695470157548')
-        expect(res[0].text.trim()).toEqual('Grafik w dniach 25.09.2023 - 01.10.2023')
+        const res = extractScheduleData(dom)
+        expect(res.links.length).toEqual(1)
+        expect(res.links[0].url).toEqual('https://sport.um.warszawa.pl/documents/63410428/86678446/25.09.2023-01.10.2023.pdf/efa98ae3-bca3-9d5e-caf6-4a474f73fcf4?t=1695470157548')
+        expect(res.links[0].text.trim()).toEqual('Grafik w dniach 25.09.2023 - 01.10.2023')
     })
 
     it('example2.html', async () => {
@@ -66,12 +75,34 @@ describe('getScheduleLinks', () => {
         })
 
         const dom = (new DOMParser()).parseFromString(data.toString(), "text/html")
-        const res = extractScheduleLinks(dom)
-        expect(res.length).toEqual(2)
-        expect(res[0].url).toEqual('https://sport.um.warszawa.pl/documents/63410428/86678446/25.09.2023-01.10.2023.pdf/efa98ae3-bca3-9d5e-caf6-4a474f73fcf4?t=1695470157548')
-        expect(res[0].text.trim()).toEqual('Grafik w dniach 25.09.2023 - 01.10.2023')
-        expect(res[1].url).toEqual('https://sport.um.warszawa.pl/documents/63410428/86678446/Dostepno%C5%9B%C4%87+tor%C3%B3w+i+niecki+od+02.10.2023.pdf/c7f437c6-b7cf-57f2-99a5-d70d3838dfeb?t=1695905833154')
-        expect(res[1].text.trim()).toEqual('Grafik dostępności od 02.10.2023')
+        const res = extractScheduleData(dom)
+        expect(res.links.length).toEqual(2)
+        expect(res.links[0].url).toEqual('https://sport.um.warszawa.pl/documents/63410428/86678446/25.09.2023-01.10.2023.pdf/efa98ae3-bca3-9d5e-caf6-4a474f73fcf4?t=1695470157548')
+        expect(res.links[0].text.trim()).toEqual('Grafik w dniach 25.09.2023 - 01.10.2023')
+        expect(res.links[1].url).toEqual('https://sport.um.warszawa.pl/documents/63410428/86678446/Dostepno%C5%9B%C4%87+tor%C3%B3w+i+niecki+od+02.10.2023.pdf/c7f437c6-b7cf-57f2-99a5-d70d3838dfeb?t=1695905833154')
+        expect(res.links[1].text.trim()).toEqual('Grafik dostępności od 02.10.2023')
+    })
+
+    it('example3.html', async () => {
+        const jsdom = require("jsdom")
+        const { JSDOM } = jsdom
+        global.DOMParser = new JSDOM().window.DOMParser
+
+        const data = await new Promise<Buffer>((resolve, reject) => {
+            fs.readFile('tests/example3.html', (err, data) => {
+                if (err) {
+                    reject(err)
+                }
+                resolve(data)
+            })
+        })
+
+        const dom = (new DOMParser()).parseFromString(data.toString(), "text/html")
+        const res = extractScheduleData(dom)
+        expect(res.links.length).toEqual(1)
+        expect(res.links[0].url).toEqual('https://sport.um.warszawa.pl/documents/63410428/86678446/SKMBT_C36024051311420.pdf/5fab7b4a-e2e9-6338-6bf7-72d28c88ed20?t=1715605130892')
+        expect(res.links[0].text.trim()).toEqual('Grafik dostępności w dniach 13-19.05.2024')
+        expect(res.notParsedSections).toEqual([" KOMUNIKAT  "])
     })
 })
 

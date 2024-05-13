@@ -46,7 +46,7 @@ jobs:
       - uses: actions/setup-node@v3
         if: steps.changes.outputs.web == 'true'
         with:
-          node-version: 16
+          node-version: 20
           cache: 'npm'
           cache-dependency-path: web/package-lock.json
 
