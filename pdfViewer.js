@@ -44,7 +44,7 @@ export function renderPdf(pdfSource, container, beforeRender = undefined) {
         container.appendChild(containerDiv);
         new ResizeObserver(() => __awaiter(this, void 0, void 0, function* () {
             containerDiv.innerHTML = '';
-            renderOnce(doc, containerDiv);
+            yield renderOnce(doc, containerDiv);
         })).observe(containerDiv);
         yield renderOnce(doc, containerDiv);
     });

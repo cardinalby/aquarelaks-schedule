@@ -13,9 +13,9 @@ const SCHEDULE_FOLD_NODE_SUBSTR = "GRAFIK DOSTĘPNOŚCI";
 const DATE_FORMAT = 'DD-MM-YYYY';
 export function getScheduleLinks(dom, after) {
     return __awaiter(this, void 0, void 0, function* () {
-        const extractedLinks = extractScheduleLinks(dom);
+        const extractedData = extractScheduleData(dom);
         return {
-            relevant: rearrangeScheduleLinks(extractedLinks
+            relevant: rearrangeScheduleLinks(extractedData.links
                 .map(link => {
                 const parsedText = parseScheduleLinkText(link.text);
                 return {
@@ -24,7 +24,8 @@ export function getScheduleLinks(dom, after) {
                     toDate: parsedText.toDate
                 };
             }), after),
-            totalCount: extractedLinks.length
+            totalCount: extractedData.links.length,
+            notParsedSections: extractedData.notParsedSections,
         };
     });
 }
@@ -123,20 +124,25 @@ export function parseScheduleLinkText(text) {
     }
     return parsed || { fromDate: null, toDate: null };
 }
-export function extractScheduleLinks(dom) {
+export function extractScheduleData(dom) {
     const accordionCards = dom.querySelectorAll("div.card");
     if (accordionCards.length === null) {
         throw new Error(`Accordion cards not found`);
     }
-    const res = Array();
+    const res = {
+        links: Array(),
+        notParsedSections: Array()
+    };
     for (let accordionCard of accordionCards) {
         const buttonElement = accordionCard.querySelector("button.btn");
         if (buttonElement === null) {
-            throw new Error(`Button not found in accordion card`);
+            res.notParsedSections.push("<unknown>");
+            continue;
         }
         const linkElement = accordionCard.querySelector("a");
         if (linkElement === null) {
-            throw new Error(`Link not found in accordion card`);
+            res.notParsedSections.push(buttonElement.textContent || "<unknown>");
+            continue;
         }
         const text = buttonElement.textContent;
         let url = linkElement.getAttribute('href');
@@ -144,10 +150,13 @@ export function extractScheduleLinks(dom) {
             if (!url.startsWith("http://") && !url.startsWith("https://")) {
                 url = AQUARELAKS_LINKS_BASE_URL + url;
             }
-            res.push({
+            res.links.push({
                 text: text.trim(),
                 url: url,
             });
+        }
+        else {
+            res.notParsedSections.push("<unknown>");
         }
     }
     return res;
