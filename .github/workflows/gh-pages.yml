@@ -1,33 +1,70 @@
-name: github pages
+name: deploy
 
 on:
   push:
     branches:
       - master
+  workflow_dispatch:
 permissions:
-  contents: write
+  id-token: write
+  pages: write
 jobs:
-  deploy:
+  deploy_worker:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./cloudflareWorker
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            cloudflareWorker:
+              - 'cloudflareWorker/**'
+      - name: Deploy
+        if: steps.changes.outputs.cloudflareWorker == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          command: publish
+
+  deploy_pages:
     runs-on: ubuntu-20.04
     defaults:
       run:
         working-directory: ./web
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: dorny/paths-filter@v3
+        id: changes
         with:
-          node-version: 16
+          filters: |
+            web:
+              - '**'
+
+      - uses: actions/setup-node@v4
+        if: steps.changes.outputs.web == 'true'
+        with:
+          node-version: 20
           cache: 'npm'
           cache-dependency-path: web/package-lock.json
 
       - name: Install dependencies
+        if: steps.changes.outputs.web == 'true'
         run: npm ci
 
+      - name: Test
+        if: steps.changes.outputs.web == 'true'
+        run: npm run test
+
       - name: Build
+        if: steps.changes.outputs.web == 'true'
         run: npm run build
 
       - name: Deploy 🚀
+        if: steps.changes.outputs.web == 'true'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: ./web/dist
