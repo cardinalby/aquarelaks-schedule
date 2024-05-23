@@ -8,6 +8,7 @@ on:
 permissions:
   id-token: write
   pages: write
+  contents: write
 jobs:
   deploy_worker:
     runs-on: ubuntu-latest
