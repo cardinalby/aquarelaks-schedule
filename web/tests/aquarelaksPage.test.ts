@@ -14,7 +14,6 @@ describe('parseScheduleLinkText', () => {
         const r = parseScheduleLinkText(
             "Grafik w dniach 25.09.2023 - 01.10.2023"
         )
-        expect(r).not.toBeNull()
         expect(r.fromDate).toEqual(new Date("9.25.2023"))
         expect(r.toDate).toEqual(new Date("10.01.2023"))
     });
@@ -23,7 +22,6 @@ describe('parseScheduleLinkText', () => {
         const r = parseScheduleLinkText(
             "Grafik dostępności w dniach 13-19.05.2024"
         )
-        expect(r).not.toBeNull()
         expect(r.fromDate).toEqual(new Date("05.13.2024"))
         expect(r.toDate).toEqual(new Date("05.19.2024"))
     });
@@ -32,8 +30,15 @@ describe('parseScheduleLinkText', () => {
         const r = parseScheduleLinkText(
             "Grafik dostępności od 02.10.2023"
         )
-        expect(r).not.toBeNull()
         expect(r.fromDate).toEqual(new Date("10.02.2023"))
+        expect(r.toDate).toEqual(null)
+    });
+
+    it('from implicit', () => {
+        const r = parseScheduleLinkText(
+            "Grafik dostępności w dniach 20.05.2024"
+        )
+        expect(r.fromDate).toEqual(new Date("05.20.2024"))
         expect(r.toDate).toEqual(null)
     });
 })
