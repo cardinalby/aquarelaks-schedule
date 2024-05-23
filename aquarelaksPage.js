@@ -99,16 +99,16 @@ export function parseScheduleLinkText(text) {
     let dateRegexp = '\\d{1,2}\\.\\d{1,2}\\.\\d{4}';
     const dateRangeRegexp = new RegExp(`(${dateRegexp})\\s*[\\-–]\\s*(${dateRegexp})`);
     const daysRangeRegexp = new RegExp(`(\\d{1,2})\\s*[\\-–]\\s*(\\d{1,2})\\.(\\d{1,2}\\.\\d{4})`);
-    const dateFromRegexp = new RegExp(`(od|po|z).*?(${dateRegexp})`);
-    const dateToRegexp = new RegExp(`(do|przed).*?(${dateRegexp})`);
+    const dateToRegexp = new RegExp(`(do|przed).{0,8}(${dateRegexp})`);
+    const dateFromRegexp = new RegExp(`(od|po|z)?.{0,8}(${dateRegexp})`);
     let cases = [
         [dateRangeRegexp, regexpRes => ({ from: regexpRes[1], to: regexpRes[2] })],
         [daysRangeRegexp, regexpRes => ({
                 from: regexpRes[1] + '.' + regexpRes[3],
                 to: regexpRes[2] + '.' + regexpRes[3]
             })],
+        [dateToRegexp, regexpRes => ({ from: null, to: regexpRes[2] })],
         [dateFromRegexp, regexpRes => ({ from: regexpRes[2], to: null })],
-        [dateToRegexp, regexpRes => ({ from: null, to: regexpRes[2] })]
     ];
     let parsed = null;
     for (let reCase of cases) {
