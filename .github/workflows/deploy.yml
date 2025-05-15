@@ -31,7 +31,7 @@ jobs:
           command: publish
 
   deploy_pages:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./web
