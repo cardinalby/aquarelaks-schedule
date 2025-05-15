@@ -1,5 +1,5 @@
 import * as moment from "moment";
-import {AQUARELAKS_LINKS_BASE_URL} from "./urls";
+import {SPORT_UM_LINKS_BASE_URL} from "./urls";
 
 const SCHEDULE_FOLD_NODE_SUBSTR = "GRAFIK DOSTĘPNOŚCI"
 const DATE_FORMAT = 'DD-MM-YYYY'
@@ -131,8 +131,8 @@ export function parseScheduleLinkText(text: string): ParsedScheduleLinkText {
     let dateRegexp = '\\d{1,2}\\.\\d{1,2}\\.\\d{4}'
     const dateRangeRegexp = new RegExp(`(${dateRegexp})\\s*[\\-–]\\s*(${dateRegexp})`)
     const daysRangeRegexp = new RegExp(`(\\d{1,2})\\s*[\\-–]\\s*(\\d{1,2})\\.(\\d{1,2}\\.\\d{4})`)
-    const dateToRegexp = new RegExp(`(do|przed).{0,8}(${dateRegexp})`)
-    const dateFromRegexp = new RegExp(`(od|po|z)?.{0,8}(${dateRegexp})`)
+    const dateToRegexp = new RegExp(`(do|przed).{0,8}?(${dateRegexp})`)
+    const dateFromRegexp = new RegExp(`(od|po|z)?.{0,8}?(${dateRegexp})`)
 
     let cases: [RegExp, (r: RegExpExecArray) => {from: string|null, to: string|null}][] = [
         [dateRangeRegexp, regexpRes => ({from: regexpRes[1], to: regexpRes[2]})],
@@ -190,7 +190,7 @@ export function extractScheduleData(dom: Document): RawScheduleData {
         if (text && url) {
             // noinspection HttpUrlsUsage
             if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                url = AQUARELAKS_LINKS_BASE_URL + url
+                url = SPORT_UM_LINKS_BASE_URL + url
             }
             res.links.push({
                 text: text.trim(),

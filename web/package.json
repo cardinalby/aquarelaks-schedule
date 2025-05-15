@@ -16,15 +16,14 @@
     "typescript": "^4.9.4",
     "webpack": "^5.75.0",
     "webpack-cli": "^5.0.1",
-    "copy-webpack-plugin": "^11.0.0",
-    "html-webpack-plugin": "^5.5.0"
+    "copy-webpack-plugin": "^11.0.0"
   },
   "private": true,
   "scripts": {
     "clean": "rm -fr dist",
     "test": "jest",
-    "build": "npm run clean && tsc && webpack --mode=production --env=CORS_PROXY_URL='https://aquarelaks.cardinalby.workers.dev/'",
-    "build-dev": "tsc && webpack --mode=development --env=CORS_PROXY_URL='http://127.0.0.1:8787/'",
-    "build-dev-prod-proxy": "tsc && webpack --mode=development --env=CORS_PROXY_URL='https://aquarelaks.cardinalby.workers.dev/'"
+    "build": "npm run clean && webpack --mode=production --env=CORS_PROXY_URL='https://aquarelaks.cardinalby.workers.dev/'",
+    "build-dev": "webpack --mode=development --env=CORS_PROXY_URL='http://127.0.0.1:8787/'",
+    "build-dev-prod-proxy": "webpack --mode=development --env=CORS_PROXY_URL='https://aquarelaks.cardinalby.workers.dev/'"
   }
 }

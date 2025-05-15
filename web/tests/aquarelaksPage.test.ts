@@ -34,6 +34,14 @@ describe('parseScheduleLinkText', () => {
         expect(r.toDate).toEqual(null)
     });
 
+    it('od dnia', () => {
+        const r = parseScheduleLinkText(
+            "Dostępność torów i niecki od dnia 16.05.2025"
+        )
+        expect(r.fromDate).toEqual(new Date("05.16.2025"))
+        expect(r.toDate).toEqual(null)
+    });
+
     it('from implicit', () => {
         const r = parseScheduleLinkText(
             "Grafik dostępności w dniach 20.05.2024"

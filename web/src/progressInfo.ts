@@ -1,11 +1,5 @@
 export class ProgressInfo {
-    static attach(container: HTMLElement) {
-        const div = document.createElement('div')
-        container.appendChild(div)
-        return new ProgressInfo(div)
-    }
-
-    private constructor(private container: HTMLElement) {
+    constructor(private container: HTMLElement) {
     }
 
     public addMessage(msg: string) {
@@ -30,7 +24,7 @@ export class ProgressInfo {
         this.container.appendChild(p)
     }
 
-    public detach() {
-        this.container.remove()
+    public clear() {
+        this.container.innerHTML = ''
     }
 }

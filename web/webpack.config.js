@@ -1,6 +1,5 @@
 // noinspection NodeCoreCodingAssistance
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const DefinePlugin = require('webpack').DefinePlugin;
 
@@ -22,10 +21,11 @@ const config = env => { return {
         new DefinePlugin({
             'CORS_PROXY_URL': JSON.stringify(env.CORS_PROXY_URL)
         }),
-        new HtmlWebpackPlugin({title: 'Aquarelaks', favicon: 'static/favicon.png'}),
         new CopyWebpackPlugin({
             patterns: [
                 { from: 'node_modules/pdfjs-dist/build/pdf.worker.js', to: 'pdf.worker.js' },
+                { from: 'static/favicon.png', to: 'favicon.png' },
+                { from: 'static/index.html', to: 'index.html' },
             ]
         })
     ],
